@@ -1,0 +1,99 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: ./app/Dockerfile
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    container_name: web
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/code/app
+    networks:
+      - app-net
+
+  celery-worker:
+    build:
+      context: .
+      dockerfile: ./app/Dockerfile
+    command: celery --app app.celery_app:celery_app worker --loglevel=info
+    container_name: celery-worker
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./app:/code/app
+    networks:
+      - app-net
+
+  celery-beat:
+    build:
+      context: .
+      dockerfile: ./app/Dockerfile
+    command: celery --app app.celery_app:celery_app beat --loglevel=info
+    container_name: celery-beat
+    env_file:
+      - .env
+    depends_on:
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./app:/code/app
+    networks:
+      - app-net
+
+  db:
+    image: postgres:17
+    container_name: db
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+    networks:
+      - app-net
+
+  redis:
+    image: redis:7
+    container_name: redis
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: always
+    networks:
+      - app-net
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  app-net:
+    driver: bridge

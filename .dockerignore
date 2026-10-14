@@ -1,0 +1,12 @@
+.git
+.idea
+.env
+myvenv
+__pycache__
+*.py[cod]
+*.pdf
+.pytest_cache
+.mypy_cache
+.ruff_cache
+celerybeat-schedule
+celerybeat.pid
