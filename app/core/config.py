@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     app_name: str = "Deribit Price Service"
     database_url: PostgresDsn
     celery_broker_url: RedisDsn
-    deribit_base_url: AnyHttpUrl = AnyHttpUrl("https://www.deribit.com/api/v2")
+    deribit_base_url: AnyHttpUrl = AnyHttpUrl("https://www.deribit.com/api/v2/public/get_index_price")
     collection_interval_seconds: PositiveInt = 60
 
 
