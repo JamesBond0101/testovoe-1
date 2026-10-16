@@ -7,7 +7,7 @@ from app.clients.deribit_client import DeribitClient
 from app.core.config import get_settings
 from app.db.session import create_engine, create_session_factory
 from app.enums import Ticker
-from app.repositories.price_repository import PriceRepository
+from app.repositories.prices import PriceRepository
 
 
 logger = logging.getLogger(__name__)

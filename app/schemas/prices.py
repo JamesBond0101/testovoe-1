@@ -13,9 +13,5 @@ class BasePriceRecordSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class CreatePriceRecordSchema(BasePriceRecordSchema):
-    pass
-
-
 class PriceRecordSchema(BasePriceRecordSchema):
     id: int

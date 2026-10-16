@@ -7,7 +7,7 @@ def create_celery_app(settings: Settings) -> Celery:
     application = Celery(
         "deribit_price_service",
         broker=str(settings.celery_broker_url),
-        include=["app.tasks.price_tasks"],
+        include=["app.tasks.prices"],
     )
 
     application.conf.update(
